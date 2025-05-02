@@ -19,7 +19,7 @@ app = FastAPI()
 
 
 # Load model and data
-df = pd.read_csv(r"C:\Heliware\fastAPI\medical\data\diabetes_prediction_dataset (2).csv")
+df = pd.read_csv("data/diabetes_prediction_dataset (2).csv")
 loaded_model = pickle.load(open('trained_model.sav', 'rb'))
 pneumonia_model = load_model("pneumonia.h5")
 
