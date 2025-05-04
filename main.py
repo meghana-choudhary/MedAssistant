@@ -1,27 +1,42 @@
-from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Request, Form, HTTPException
 from fastapi.templating import Jinja2Templates
 import numpy as np
 import pandas as pd
 import pickle
 from fastapi.staticfiles import StaticFiles
-import os
-from fastapi.responses import JSONResponse
-
+from fastapi.responses import HTMLResponse, JSONResponse
+from pydantic import BaseModel
+from dotenv import load_dotenv
+from langchain.prompts import PromptTemplate
+from langchain.chains import LLMChain
+import google.generativeai as genai
+from langchain_google_genai import ChatGoogleGenerativeAI
 from fastapi import File, UploadFile
 from tensorflow.keras.models import load_model
 import cv2
 import io
+import os
 from PIL import Image
 
 
 app = FastAPI()
 
+# Add these new classes and configurations
+class ChatRequest(BaseModel):
+    message: str
+
+class ChatResponse(BaseModel):
+    response: str
+
+# Initialize Google Gemini
+load_dotenv()
+api_key = os.getenv('GOOGLE_API_KEY')
+
 
 # Load model and data
 df = pd.read_csv("data/diabetes_prediction_dataset (2).csv")
-loaded_model = pickle.load(open('trained_model.sav', 'rb'))
-pneumonia_model = load_model("pneumonia.h5")
+loaded_model = pickle.load(open('models/trained_model.sav', 'rb'))
+pneumonia_model = load_model("models/pneumonia.h5")
 
 templates = Jinja2Templates(directory="templates")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -91,4 +106,51 @@ async def predict_pneumonia(request: Request, file: UploadFile = File(...)):
     result = pneumonia_prediction(file)
     return JSONResponse(content={"result": result})
 
+
+@app.get("/chatbot", response_class=HTMLResponse)
+async def get_chat(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request, "user_message": None, "bot_response": None})
+
+
+# Define the medical prompt template
+medical_prompt = PromptTemplate(
+    input_variables=["query"],
+    template="""
+    You are Ema, an advanced AI medical assistant.
+    Your goal is to provide clear, factual, and concise answers to medical queries.
+    Always maintain a professional yet friendly tone.
+
+    Guidelines:
+    - If unsure, acknowledge uncertainty and recommend consulting a healthcare provider
+    - Focus on general medical information and avoid specific diagnoses
+    - Provide sources when discussing medical facts
+    - Break down complex medical terms
+    - Use bullet points for lists
+    - Format important information in **bold**
+
+    User Query: {query}
+
+    Response:
+    """
+)
+
+# Initialize the LLM
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash-preview-04-17",
+    temperature=0.2,
+    convert_system_message_to_human=True,
+    google_api_key=api_key
+)
+
+# Create the chain
+chain = LLMChain(llm=llm, prompt=medical_prompt)
+
+# Keep your existing routes and add this new one
+@app.post("/chat")
+async def chat(request: ChatRequest):
+    try:
+        response = chain.run(query=request.message)
+        return ChatResponse(response=response)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
