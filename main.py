@@ -36,9 +36,9 @@ api_key = os.getenv('GOOGLE_API_KEY')
 
 
 # Load model and data
-df = pd.read_csv(r"C:\Heliware\fastAPI\medical\data\diabetes_prediction_dataset (2).csv")
-loaded_model = pickle.load(open('trained_model.sav', 'rb'))
-pneumonia_model = load_model("pneumonia.h5")
+df = pd.read_csv("data/diabetes_prediction_dataset (2).csv")
+loaded_model = pickle.load(open('models/trained_model.sav', 'rb'))
+pneumonia_model = load_model("models/pneumonia.h5")
 
 def load_custom_model():
     base_model = tf.keras.applications.EfficientNetB0(include_top=False, input_shape=(224, 224, 3), pooling='avg')
@@ -193,4 +193,51 @@ async def chat(request: ChatRequest):
 
 
 
+
+@app.get("/chatbot", response_class=HTMLResponse)
+async def get_chat(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request, "user_message": None, "bot_response": None})
+
+
+# Define the medical prompt template
+medical_prompt = PromptTemplate(
+    input_variables=["query"],
+    template="""
+    You are Ema, an advanced AI medical assistant.
+    Your goal is to provide clear, factual, and concise answers to medical queries.
+    Always maintain a professional yet friendly tone.
+
+    Guidelines:
+    - If unsure, acknowledge uncertainty and recommend consulting a healthcare provider
+    - Focus on general medical information and avoid specific diagnoses
+    - Provide sources when discussing medical facts
+    - Break down complex medical terms
+    - Use bullet points for lists
+    - Format important information in **bold**
+
+    User Query: {query}
+
+    Response:
+    """
+)
+
+# Initialize the LLM
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash-preview-04-17",
+    temperature=0.2,
+    convert_system_message_to_human=True,
+    google_api_key=api_key
+)
+
+# Create the chain
+chain = LLMChain(llm=llm, prompt=medical_prompt)
+
+# Keep your existing routes and add this new one
+@app.post("/chat")
+async def chat(request: ChatRequest):
+    try:
+        response = chain.run(query=request.message)
+        return ChatResponse(response=response)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
