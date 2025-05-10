@@ -1,27 +1,55 @@
-from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Request, Form, HTTPException
 from fastapi.templating import Jinja2Templates
 import numpy as np
 import pandas as pd
 import pickle
 from fastapi.staticfiles import StaticFiles
-import os
-from fastapi.responses import JSONResponse
-
+from fastapi.responses import HTMLResponse, JSONResponse
+from pydantic import BaseModel
+from dotenv import load_dotenv
+from langchain.prompts import PromptTemplate
+from langchain.chains import LLMChain
+import google.generativeai as genai
+from langchain_google_genai import ChatGoogleGenerativeAI
 from fastapi import File, UploadFile
 from tensorflow.keras.models import load_model
 import cv2
 import io
+import os
 from PIL import Image
+import tensorflow as tf
+from tensorflow.keras.applications.efficientnet import preprocess_input
 
 
 app = FastAPI()
+
+# Add these new classes and configurations
+class ChatRequest(BaseModel):
+    message: str
+
+class ChatResponse(BaseModel):
+    response: str
+
+# Initialize Google Gemini
+load_dotenv()
+api_key = os.getenv('GOOGLE_API_KEY')
 
 
 # Load model and data
 df = pd.read_csv(r"C:\Heliware\fastAPI\medical\data\diabetes_prediction_dataset (2).csv")
 loaded_model = pickle.load(open('trained_model.sav', 'rb'))
 pneumonia_model = load_model("pneumonia.h5")
+
+def load_custom_model():
+    base_model = tf.keras.applications.EfficientNetB0(include_top=False, input_shape=(224, 224, 3), pooling='avg')
+    x = tf.keras.layers.Dense(256, activation='relu')(base_model.output)
+    output = tf.keras.layers.Dense(5, activation='softmax')(x)  # Changed from 10 to 5
+
+    model = tf.keras.Model(inputs=base_model.input, outputs=output)
+    model.load_weights("model.weights.h5")
+    return model
+
+model = load_custom_model()
 
 templates = Jinja2Templates(directory="templates")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -90,5 +118,79 @@ def predict_form(request: Request):
 async def predict_pneumonia(request: Request, file: UploadFile = File(...)):
     result = pneumonia_prediction(file)
     return JSONResponse(content={"result": result})
+
+@app.get("/predict_retinal", response_class=HTMLResponse)
+def predict_form(request: Request):
+    return templates.TemplateResponse("retinopathy.html", {"request": request})
+
+@app.post("/predict_retinal")
+async def upload_image(file: UploadFile = File(...)):
+    try:
+        contents = await file.read()
+        image = Image.open(io.BytesIO(contents)).convert("RGB")
+        image = image.resize((224, 224))
+
+        image_array = np.array(image)
+        image_array = preprocess_input(image_array)  # EfficientNet preprocessing
+        image_array = np.expand_dims(image_array, axis=0)  # Shape: (1, 224, 224, 3)
+
+        prediction = model.predict(image_array)
+        predicted_class = int(np.argmax(prediction))
+
+        return {"predicted_class": predicted_class, "raw_output": prediction.tolist()}
+
+    except Exception as e:
+        return JSONResponse(status_code=400, content={"error": str(e)})
+
+
+
+@app.get("/chatbot", response_class=HTMLResponse)
+async def get_chat(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request, "user_message": None, "bot_response": None})
+
+
+# Define the medical prompt template
+medical_prompt = PromptTemplate(
+    input_variables=["query"],
+    template= """
+    You are Ema, an advanced AI medical assistant.
+    Your goal is to provide clear, factual, and concise answers to medical queries.
+    Always maintain a professional yet friendly tone.
+
+    Guidelines:
+    - If unsure, acknowledge uncertainty and recommend consulting a healthcare provider
+    - Focus on general medical information and avoid specific diagnoses
+    - Provide sources when discussing medical facts
+    - Break down complex medical terms
+    - Use bullet points for lists
+    - Format important information in **bold**
+
+    User Query: {query}
+
+    Response:
+    """
+)
+
+# Initialize the LLM
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash-preview-04-17",
+    temperature=0.2,
+    convert_system_message_to_human=True,
+    google_api_key=api_key
+)
+
+# Create the chain
+chain = LLMChain(llm=llm, prompt=medical_prompt)
+
+# Keep your existing routes and add this new one
+@app.post("/chat")
+async def chat(request: ChatRequest):
+    try:
+        response = chain.run(query=request.message)
+        return ChatResponse(response=response)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 
 
