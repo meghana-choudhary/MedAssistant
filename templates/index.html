@@ -100,21 +100,26 @@
     <section id="talk-to-ema" class="chat-section">
         <h2>Talk to Ema</h2>
         <div class="chat-container">
-            <div class="chat-messages">
+            <div class="chat-messages" id="chat-messages">
+                <!-- Initial bot message -->
                 <div class="message bot">
-                    <img src="https://placehold.co/40x40" alt="Ema">
-                    <p>Hi! I'm Ema, your medical assistant. How can I help you today?</p>
+                    <div class="avatar-container">
+                        <img src="static/images/Image_ema.png" alt="Ema" class="avatar">
+                    </div>
+                    <div class="message-content">
+                        Hi! I'm Ema, your medical assistant. How can I help you today?
+                    </div>
                 </div>
             </div>
             <div class="chat-input">
-                <input type="text" placeholder="Type your message here...">
-                <button class="send-btn">
+                <input type="text" id="user-input" placeholder="Type your message here...">
+                <button class="send-btn" onclick="sendMessage()">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
         </div>
     </section>
-
+    
     <script>
         const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
         const currentTheme = localStorage.getItem('theme');
@@ -157,5 +162,6 @@
             }
         });
     </script>
+    <script src="static/js/script.js"></script>
 </body>
 </html>
