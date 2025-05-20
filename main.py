@@ -9,6 +9,7 @@ import tensorflow as tf
 
 from utils.diabetic import diabetes_prediction
 from utils.pneumonia import pneumonia_prediction
+from utils.retinopathy import retinopathy_prediction
 from utils.chatbot import get_chatbot_response
 
 app = FastAPI()
@@ -56,6 +57,15 @@ async def predict_pneumonia(file: UploadFile = File(...)):
     result = pneumonia_prediction(file)
     return JSONResponse(content={"result": result})
 
+@app.get("/predict_retinal", response_class=HTMLResponse)
+def predict_retinopathy_form(request: Request):
+    return templates.TemplateResponse("retinopathy.html", {"request": request})
+
+@app.post("/predict_retinal", response_class=JSONResponse)
+async def predict_retinopathy(file: UploadFile = File(...)):
+    result = retinopathy_prediction(file)
+    return JSONResponse(content={"result": result})
+
 @app.get("/chatbot", response_class=HTMLResponse)
 async def get_chat(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "user_message": None, "bot_response": None})
@@ -71,6 +81,9 @@ async def chat(request: ChatRequest):
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+
+
+
 
 
 
