@@ -33,8 +33,8 @@ class ChatResponse(BaseModel):
 
 # Load model and data
 df = pd.read_csv("data/diabetes_prediction_dataset (2).csv")
-loaded_model = pickle.load(open('trained_model.sav', 'rb'))
-pneumonia_model = load_model("pneumonia.h5")
+loaded_model = pickle.load(open('models/trained_model.sav', 'rb'))
+pneumonia_model = load_model("models/pneumonia.h5")
 
 templates = Jinja2Templates(directory="templates")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
