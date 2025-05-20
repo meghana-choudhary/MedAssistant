@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MedAssistant - AI Powered Medical Assistant</title>
     <link rel="stylesheet" href="static/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
     <!-- Navbar -->
     <nav class="navbar">
@@ -28,11 +31,14 @@
     <section id="home" class="home-section">
         <div class="home-content">
             <h1>AI-Powered Medical Assistant</h1>
-            <p>Revolutionizing healthcare diagnostics with advanced artificial intelligence. MedAssistant provides accurate disease classification for Diabetes, Pneumonia, and Diabetic Retinopathy using state-of-the-art machine learning models.</p>
+            <p>Revolutionizing healthcare diagnostics with advanced artificial intelligence. MedAssistant provides
+                accurate disease classification for Diabetes, Pneumonia, and Diabetic Retinopathy using state-of-the-art
+                machine learning models.</p>
             <button class="cta-button">Get Started</button>
         </div>
         <div class="home-image">
-            <img src="https://placehold.co/500x400" alt="Medical AI">
+            <img id="hero-img" src="static/images/Image_st.png" alt="Medical AI" width="480"
+                style="margin-right: 80px; margin-top: 30px;">
         </div>
     </section>
 
@@ -43,7 +49,8 @@
             <div class="feature-card">
                 <i class="fas fa-syringe"></i>
                 <h3>Diabetes Detection</h3>
-                <p>Advanced analysis of blood glucose levels and other vital parameters to detect diabetes with high accuracy.</p>
+                <p>Advanced analysis of blood glucose levels and other vital parameters to detect diabetes with high
+                    accuracy.</p>
             </div>
             <div class="feature-card">
                 <i class="fas fa-stethoscope"></i>
@@ -64,23 +71,23 @@
         <div class="disease-cards">
             <div class="card">
                 <h3>Diabetes Classification</h3>
-                <img src="https://placehold.co/300x200" alt="Diabetes">
+                <img src="static/images/Image_diabetes.png" alt="Diabetes" width="300" height="300">
                 <p>Upload patient data and get instant diabetes risk assessment.</p>
                 <a href="/predict_diabetes" class="classify-btn">Classify Diabetes</a>
             </div>
 
             <div class="card">
                 <h3>Pneumonia Detection</h3>
-                <img src="https://placehold.co/300x200" alt="Pneumonia">
+                <img src="static/images/Image_pneumonia.png" alt="Pneumonia" width="300" height="300">
                 <p>Upload chest X-rays for pneumonia detection.</p>
                 <a href="/predict_pneumonia" class="classify-btn">Classify Pneumonia</a>
             </div>
 
             <div class="card">
                 <h3>Retinopathy Screening</h3>
-                <img src="https://placehold.co/300x200" alt="Retinopathy">
+                <img src="static/images/Image_retinopathy.png" alt="Retinopathy" width="300" height="300">
                 <p>Upload retinal images for diabetic retinopathy screening.</p>
-                <a href="retinopathy.html" class="classify-btn">Classify Retinopathy</a>
+                <a href="/predict_retinal" class="classify-btn">Classify Retinopathy</a>
             </div>
         </div>
     </section>
@@ -96,7 +103,6 @@
         </div>
     </section>
 
-    <!-- Talk to Ema Section -->
     <section id="talk-to-ema" class="chat-section">
         <h2>Talk to Ema</h2>
         <div class="chat-container">
@@ -119,11 +125,12 @@
             </div>
         </div>
     </section>
+
     
     <script>
         const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
         const currentTheme = localStorage.getItem('theme');
-        
+
         if (currentTheme === 'dark') {
             document.body.setAttribute('data-theme', 'dark');
             document.querySelector('.theme-toggle i').className = 'fas fa-sun';
@@ -134,11 +141,11 @@
             document.body.setAttribute('data-theme', 'dark');
             document.querySelector('.theme-toggle i').className = 'fas fa-sun';
         }
-        
+
         function toggleTheme() {
             const body = document.body;
             const icon = document.querySelector('.theme-toggle i');
-            
+
             if (body.getAttribute('data-theme') === 'dark') {
                 body.removeAttribute('data-theme');
                 icon.className = 'fas fa-moon';
@@ -149,7 +156,7 @@
                 localStorage.setItem('theme', 'dark');
             }
         }
-        
+
         prefersDarkScheme.addListener((e) => {
             if (!localStorage.getItem('theme')) {
                 if (e.matches) {
@@ -162,6 +169,8 @@
             }
         });
     </script>
+
     <script src="static/js/script.js"></script>
 </body>
+
 </html>
