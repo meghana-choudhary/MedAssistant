@@ -1,221 +1,93 @@
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Diabetes Classification - MedAssistant</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-gradient: linear-gradient(135deg, #6e8efb, #a777e3);
-            --secondary-gradient: linear-gradient(135deg, #8E2DE2, #4A00E0);
-            --accent-gradient: linear-gradient(135deg, #FF416C, #FF4B2B);
-            --background-color: #f8f9fc;
-            --text-color: #2d3436;
-            --card-background: #ffffff;
-            --shadow-color: rgba(0, 0, 0, 0.1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background-color: var(--background-color);
-            min-height: 100vh;
-            padding: 2rem;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-            background: var(--card-background);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px var(--shadow-color);
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 2rem;
-            background: var(--primary-gradient);
-            -webkit-text-fill-color: transparent;
-            -webkit-background-clip: text;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-color);
-            font-weight: 500;
-        }
-
-        select, input {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        select:focus, input:focus {
-            outline: none;
-            border-color: #6e8efb;
-            box-shadow: 0 0 0 2px rgba(110, 142, 251, 0.1);
-        }
-        
-        .submit-btn {
-            display: block;
-            width: 100%;
-            padding: 1rem;
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px var(--shadow-color);
-        }
-
-        .result {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            border-radius: 10px;
-            background: var(--secondary-gradient);
-            color: white;
-            text-align: center;
-            display: none;
-        }
-
-        .home-btn {
-            display: inline-block;
-            padding: 0.8rem 1.5rem;
-            background: var(--accent-gradient);
-            color: white;
-            text-decoration: none;
-            border-radius: 10px;
-            margin-top: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .home-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px var(--shadow-color);
-        }
-    </style>
-</head>
-<body>
+    <link rel="stylesheet" href="static/css/diabetic.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <div class="container">
-        <h1>Diabetes Risk Assessment</h1>
-        <form id="diabetesForm" action="/predict_diabetes" method="post">
-            <div class="form-group">
-                <label for="gender">Gender</label>
-                <select id="gender" name="gender" required>
-                    <option value="">Select Gender</option>
-                    <option value="0">Female</option>
-                    <option value="1">Male</option>
-                    <option value="2">Others</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="age">Age</label>
-                <input type="number" id="age" name="age" min="0" max="120" required>
-            </div>
-            <div class="form-group">
-                <label for="hypertension">Hypertension</label>
-                <select id="hypertension" name="hypertension" required>
-                    <option value="">Select Option</option>
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="heart_disease">Heart Disease</label>
-                <select id="heart_disease" name="heart_disease" required>
-                    <option value="">Select Option</option>
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="smoking">Smoking History</label>
-                <select id="smoking" name="smoking_history" required>
-                    <option value="">Select Option</option>
-                    <option value="0">No Info</option>
-                    <option value="1">Current</option>
-                    <option value="2">Ever</option>
-                    <option value="3">Former</option>
-                    <option value="4">Never</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="bmi">BMI</label>
-                <input type="number" id="bmi" name="bmi" step="0.1" required>
-            </div>
-            <div class="form-group">
-                <label for="hba1c">HbA1c Level</label>
-                <input type="number" id="hba1c" name="HbA1c_level" step="0.1" required>
-            </div>
-            <div class="form-group">
-                <label for="glucose">Blood Glucose Level</label>
-                <input type="number" id="glucose" name="blood_glucose_level" required>
-            </div>
-            <button type="submit" class="submit-btn">Analyze Risk</button>
-        </form>
-        <div id="result" class="result">
-
+      <h1>Diabetes Risk Assessment</h1>
+      <form id="diabetesForm" action="/predict_diabetes" method="post">
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <select id="gender" name="gender" required>
+            <option value="">Select Gender</option>
+            <option value="0">Female</option>
+            <option value="1">Male</option>
+            <option value="2">Others</option>
+          </select>
         </div>
-        <div style="text-align: center; margin-top: 2rem;">
-            <a href="/" class="home-btn">Back to Home</a>
+        <div class="form-group">
+          <label for="age">Age</label>
+          <input type="number" id="age" name="age" min="0" max="120" required />
         </div>
+        <div class="form-group">
+          <label for="hypertension">Hypertension</label>
+          <select id="hypertension" name="hypertension" required>
+            <option value="">Select Option</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="heart_disease">Heart Disease</label>
+          <select id="heart_disease" name="heart_disease" required>
+            <option value="">Select Option</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="smoking">Smoking History</label>
+          <select id="smoking" name="smoking_history" required>
+            <option value="">Select Option</option>
+            <option value="0">No Info</option>
+            <option value="1">Current</option>
+            <option value="2">Ever</option>
+            <option value="3">Former</option>
+            <option value="4">Never</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="bmi">BMI</label>
+          <input type="number" id="bmi" name="bmi" step="0.1" required />
+        </div>
+        <div class="form-group">
+          <label for="hba1c">HbA1c Level</label>
+          <input
+            type="number"
+            id="hba1c"
+            name="HbA1c_level"
+            step="0.1"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="glucose">Blood Glucose Level</label>
+          <input
+            type="number"
+            id="glucose"
+            name="blood_glucose_level"
+            required
+          />
+        </div>
+        <button type="submit" class="submit-btn">Analyze Risk</button>
+      </form>
+      <div id="result" class="result"></div>
+      <div style="text-align: center; margin-top: 2rem">
+        <a href="/" class="home-btn">Back to Home</a>
+      </div>
     </div>
-    <script>
-    document.getElementById('diabetesForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const result = document.getElementById('result');
-    result.style.display = 'block';
-    result.innerHTML = "Processing..."; // Loading state
-
-    try {
-        const response = await fetch('/predict_diabetes', {
-            method: 'POST',
-            body: new FormData(this)
-        });
-
-        const responseText = await response.text();
-        console.log("Raw response:", responseText);
-
-        if (!response.ok) {
-            throw new Error(`Server error: ${response.status}`);
-        }
-
-        const data = JSON.parse(responseText); // Parse manually for better errors
-        result.innerHTML = data.result || "No result returned";
-        
-    } catch (error) {
-        console.error("Full error:", error);
-        result.innerHTML = `
-            Error: ${error.message}<br>
-            Check console for details
-        `;
-    }
-});
-</script>
-        
-</body>
+    <script src="static/js/diabetic.js"></script>
+  </body>
 </html>
