@@ -5,7 +5,6 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import os
 import uvicorn
-import tensorflow as tf
 
 from utils.diabetic import diabetes_prediction
 from utils.pneumonia import pneumonia_prediction
