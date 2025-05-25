@@ -51,7 +51,7 @@ An intelligent medical assistant built using AI, ML, and DL techniques to aid in
 
 ```bash
 git clone https://github.com/meghana-choudhary/MedAssistant.git
-cd medical-assistant
+cd MedAssistant
 ```
 
 2. **Create and activate a conda environment:**
