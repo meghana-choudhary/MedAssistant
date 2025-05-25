@@ -47,18 +47,37 @@ An intelligent medical assistant built using AI, ML, and DL techniques to aid in
 
 ## 📦 Setup Instructions
 
+1. **Clone the repository:**
+
 ```bash
-# 1. Clone the repo
 git clone https://github.com/meghana-choudhary/MedAssistant.git
 cd medical-assistant
+```
 
-# 2. Create and activate a conda environment
+2. **Create and activate a conda environment:**
+
+```bash
 conda create -n medassist python=3.11
 conda activate medassist
+```
 
-# 3. Install dependencies
+3. **Install Dependencies:**
+
+```bash
 pip install -r requirements.txt
+```
 
-# 4. Run the app
+4. **Create Environment File:** Create a file named .env in the root directory of the project.
+
+5. **Add API Keys:** Open the .env file and add your API keys like this:
+
+```bash
+GOOGLE_API_KEY=YOUR_GOOGLE_API_KEY
+```
+
+6. **Run the Backend:**
+
+```bash
 python main.py
+```
 
